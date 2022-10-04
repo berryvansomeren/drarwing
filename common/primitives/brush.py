@@ -1,62 +1,90 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, astuple
 import random
 
 import cv2
 import numpy as np
 from pathlib import Path
+from typing import Optional, List
 
-from common.primitives.color import RGBColor, random_color
-from common.primitives.point import Point, random_point
+from common.primitives.color import Color
+from common.primitives.point import Point
 
 
 @dataclass
 class Brush:
-    color               : RGBColor
-    brush_texture_index : int
-    position            : Point
-    angle               : float
-    scale                : float
+    color           : Color
+    texture_index   : int
+    position        : Point
+    angle           : float
+    size            : int
 
 
-def _preload_brush_textures():
-    directory_name = Path(__file__).parent / 'watercolor_brushes/'
+_g_preloaded_brush_textures : Optional[List ] = None
+
+
+def set_global_brush_textures( brush_textures : List[np.ndarray ] ) -> None:
+    global _g_preloaded_brush_textures
+    _g_preloaded_brush_textures = brush_textures
+
+
+def get_global_brush_textures() -> List[np.ndarray]:
+    return _g_preloaded_brush_textures
+
+
+def preload_brush_textures( directory_name : Path ):
     texture_paths = []
     for extension in [ '.jpg', '.png' ]:
-        texture_paths.extend( list( directory_name.rglob( extension ) ) )
-    textures = [ cv2.imread( texture_path ) for texture_path in texture_paths ]
+        texture_paths.extend( list( directory_name.rglob( f'*{extension}' ) ) )
+    textures = [ cv2.imread( str(texture_path) ) for texture_path in texture_paths ]
     textures = [ cv2.cvtColor( texture, cv2.COLOR_BGR2GRAY ) for texture in textures ]
-    return textures
-g_preloaded_brush_textures = _preload_brush_textures()
+    set_global_brush_textures( textures )
 
 
-def random_brush_texture_index( exclude_index : int = 999 ):
-    potential_texture_indices = []
-    for i in range( len( g_preloaded_brush_textures ) ):
-        if i is not exclude_index:
-            potential_texture_indices.append( i )
-    selected_texture_index = random.choice( potential_texture_indices )
-    return selected_texture_index
-
-
-def random_brush_size( min_size : float, max_size : float ):
-    return random.uniform( min_size, max_size )
-
-
-def random_brush( width, height, min_size, max_size, sampling_mask ):
-    brush = Brush(
-        color = random_color(),
-        scale = random_brush_size( min_size, max_size ),
-        position = random_point( width, height ),
-    )
-    return brush
+def random_brush_texture_index():
+    return random.choice( range( len( get_global_brush_textures() ) ) )
 
 
 def draw_brush_on_image( brush : Brush, image : np.ndarray ) -> np.ndarray:
-    brush_texture = g_preloaded_brush_textures[ brush.brush_texture_index ]
-    brush_height, brush_width = brush_texture.shape[:2]
-    transformation_matrix = cv2.getRotationMatrix2D( (brush_width/2, brush_height/2), brush.angle, brush.scale )
-    brush_texture = cv2.warpAffine( brush_texture, transformation_matrix, (brush_width, brush_height))
-    brush_mask = np.zeros_like( brush_texture )
-    brush_mask[(brush_texture>0)] = 1 # todo: make actual mask
-    image[brush_mask] = brush_texture * brush.color
+    image_height, image_width = image.shape[:2]
+
+    brush_texture_original = get_global_brush_textures()[brush.texture_index ]
+    brush_texture_scaled = cv2.resize( brush_texture_original, (brush.size, brush.size) )
+    brush_height, brush_width = brush_texture_scaled.shape[:2]
+
+    transformation_matrix = cv2.getRotationMatrix2D( (brush_width/2, brush_height/2), brush.angle, 1 )
+    brush_texture_rotated = cv2.warpAffine( brush_texture_scaled, transformation_matrix, (brush_width, brush_height))
+
+    alpha = brush_texture_rotated.astype( float ) / 255.0
+    alpha_3 = np.dstack( (alpha, alpha, alpha) )
+
+    foreground = np.zeros( (*brush_texture_rotated.shape, 3), np.uint8 )
+    foreground[ :, : ] = brush.color
+
+    draw_y = int( brush.position.y - brush_width / 2 )
+    draw_x = int( brush.position.x - brush_height / 2 )
+
+    # define region of interest
+    y_min = max( draw_y, 0 )
+    y_max = min( draw_y + brush_height, image_height )
+    x_min = max( draw_x, 0 )
+    x_max = min( draw_x + brush_width, image_width )
+
+    background_subsection = image[y_min:y_max, x_min:x_max]
+    # Note that since we use grayscale images as brushes here,
+    # there is not really a need to cut a section from the foreground image
+    # as the whole foreground image is one solid color
+    # and the texture comes from the alpha part.
+    # However, as this code will be useful when dealing with actual images
+    # I will keep it in.
+    foreground_subsection = foreground[
+        y_min - draw_y : y_max - draw_y,
+        x_min - draw_x : x_max - draw_x
+    ]
+    alpha_subsection = alpha_3[
+        y_min - draw_y : y_max - draw_y,
+        x_min - draw_x : x_max - draw_x
+    ]
+
+    composite = background_subsection * (1 - alpha_subsection) + foreground_subsection * alpha_subsection
+    image[y_min:y_max, x_min:x_max] = composite
     return image

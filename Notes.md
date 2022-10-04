@@ -1,48 +1,21 @@
-# Notes
-
-These notes are primarily meant to summarize approaches fo inspirational projects similar to this one. 
-
-### [4dcu triangles](https://blog.4dcu.be/programming/2020/01/12/Genetic-Art-Algorithm.html):
-
-- sigma term for mutation size. Is determined manually.
-- Crossover: For every gene select if getting form mom or dad, other child gets the other option
-- survival rate: 0.05 (how many are used as parent)
-- n genes = 150
-- population size = 200
-
-### [4dcu voronoi](https://blog.4dcu.be/programming/2020/02/10/Genetic-Art-Algorithm-2.html)
-
-- Genes are points with colors that define a voronoi diagram
-- crossover like above for triangles
-- After converging, 
-  randomly remove n points, 
-  then duplicate voronoi points
-  then evolve again. Because points at the exact same locaton dont affect the image, this allows for potentially more detail, but does not distort the image
-- survival rate: 0.025
-- n genes = 250
-- population size = 250
+# References
 
 ### [anapora](https://github.com/anopara/genetic-drawing)
 
-- it's not really a GA
-  - they just update the best image with one additional brush stroke every iteration
-  - there is no crossover between specimen
-- does edge detection to determine sampling area
-  - applies a huge blur to cover non-edge areas
-  - edges are also used to determine size and direction
-- separated into stages where every stage has a fixed number of generations
-  - blur is updated every stage
-
 ### [pointilism](https://github.com/matteo-ronchetti/Pointillism)
-- softmax for determining brush size and shape
+####[blogpost](https://medium.com/hackernoon/https-medium-com-matteoronchetti-pointillism-with-python-and-opencv-f4274e6bbb7b)
 
-### Next up:
-- Remember that you were fuckign aorudn with replacing HSB with RGB again 
-- Use same brushsize estimation as pointillism
+
+## Pointillism
+- Fix ugly edge colors
+- also make proper ellipse based version again
+just copy painting and replace the brush with an ellipse
 - use a palette like pointilism
-- check what the scharr image looks like, do you need to porocess it further? larger kernel? erosion? neighborhood summing?
-- try ideas with poisson disc sampling
-- concurrency?
-- dynamic scharr blurring
 
-Note that not all algortihms now return an RGB image when they should!!!
+
+## Abstract Art
+- Fix ugly edge colors
+- using a diff image makes no sense for initial spawning  
+and can be create don the fly in the rare event of adding genes
+- score interval does not make too much sense,  
+because you also want to see the bad choices for an exploring GA

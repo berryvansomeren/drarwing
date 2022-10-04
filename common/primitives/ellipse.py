@@ -5,13 +5,13 @@ from typing import Tuple
 import cv2
 import numpy as np
 
-from common.primitives.color import HSVColor, random_color
+from common.primitives.color import Color
 from common.primitives.point import Point, random_point
 
 
 @dataclass
 class Ellipse:
-    color       : HSVColor
+    color       : Color
     position    : Point
     axes        : Tuple[ int, int ]
     angle       : float

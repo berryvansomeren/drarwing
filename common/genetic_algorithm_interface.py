@@ -1,26 +1,25 @@
 from pathlib import Path
 import random
-from typing import Any, List, Optional, Tuple, TypeVar, Generator, Protocol
+from typing import List, Optional, Tuple, TypeVar, Generator
+from abc import ABC, abstractmethod
 
 import numpy as np
 
 
 FitnessScore    = float
 FitnessScores   = List[FitnessScore]
-Specimen        = TypeVar('Specimen')
-Population      = TypeVar('Population')
-
-
-# A generic object to store debug info
-# Needs to be provided with a path in order to write debug output to disk
-class DebugInfo(Protocol):
-    def write( self, output_folder : Path ):
-        pass
+Specimen        = TypeVar('Specimen') # Genetic algorithms mainly differ in how their Specimen are defined
+Population      = List[Specimen]
 
 
 # The protocol for a genetic_algorithm is not super strict,
 # The two functions under this class define ways to deal with optional methods the protocol could implement
-class GeneticAlgorithm(Protocol):
+class GeneticAlgorithm(ABC):
+    @abstractmethod
+    def get_initial_population( self ) -> Population :
+        pass
+
+    @abstractmethod
     def apply_crossover( self, population ) -> Population:
         """
         Note that currently the parent populations is always added back to the population after crossover.
@@ -30,9 +29,11 @@ class GeneticAlgorithm(Protocol):
         """
         pass
 
+    @abstractmethod
     def apply_mutation_inplace( self, population ) -> None:
         pass
 
+    @abstractmethod
     def get_fitness( self, population: Population ) -> FitnessScores:
         """
         Note that throughout this program it is assumed that lower fitness scores are better.
@@ -40,10 +41,12 @@ class GeneticAlgorithm(Protocol):
         """
         pass
 
+    @abstractmethod
     def apply_selection( self, population, fitness_scores ) -> Tuple[ Population, FitnessScores ]:
         pass
 
-    def draw_specimen_rgb( self, specimen: Specimen ) -> np.ndarray:
+    @abstractmethod
+    def get_specimen_image_rgb( self, specimen: Specimen ) -> np.ndarray:
         """
         You might want to use a different color space in your genetic algorithm,
         but this function should always return an RGB image.
@@ -51,39 +54,22 @@ class GeneticAlgorithm(Protocol):
         """
         pass
 
-    # Optional:
-    # def is_done( self ) -> bool:
-    #     pass
-
-    # Optional:
-    # def get_debug_info( self ) -> DebugInfo:
-    #     pass
+    def is_done( self ) -> bool:
+        # by default a genetic algorithm will run indefinitely
+        return False
 
 
-def _is_done( genetic_algorithm ) -> Any:
-    # if the genetic algorithm can tell is when it is done, listen to it
-    # if it can not tell us, just iterate indefinitely until we finally run out of patience
-    f_or_none = getattr( genetic_algorithm, 'is_done', None )
-    return f_or_none( genetic_algorithm ) if f_or_none else False
-
-
-def _get_debug_info( genetic_algorithm ) -> Optional[ DebugInfo ]:
-    f_or_none = getattr( genetic_algorithm, 'get_debug_info', None )
-    return f_or_none( genetic_algorithm ) if f_or_none else None
-
-
-def make_genetic_algorithm_generator_class( genetic_algorithm, random_seed : int = 1337 ) -> Generator:
+def make_genetic_algorithm_generator( genetic_algorithm : GeneticAlgorithm, random_seed : int = 1337 ) -> Generator:
     """
-    A generator that for every iteration of the genetic algorithm returns the fitness scores and population
-    Note: the return scores and population are not sorted!
+    A generator that for every iteration of the genetic algorithm returns results
     """
-    # seed to make things reproducible
+    # use seed to make things reproducible
     random.seed( random_seed )
 
     generation_index = 0
     parent_population = genetic_algorithm.get_initial_population()
 
-    while not _is_done(genetic_algorithm):
+    while not genetic_algorithm.is_done():
         generation_index += 1
         population = genetic_algorithm.apply_crossover( parent_population )
         genetic_algorithm.apply_mutation_inplace( population )
@@ -103,10 +89,11 @@ def make_genetic_algorithm_generator_class( genetic_algorithm, random_seed : int
         scored_population = zip( selected_population, selected_fitness_scores )
         get_fitness = lambda t : t[ 1 ]
         population_sorted, fitness_scores_sorted = zip( *sorted( scored_population, key = get_fitness ) )
+        best_specimen = population_sorted[0]
+
         parent_population = list(population_sorted)
 
-        best_image = genetic_algorithm.draw_specimen( parent_population[0] )
+        best_image = genetic_algorithm.get_specimen_image_rgb(best_specimen)
         best_score = fitness_scores_sorted[0]
-        debug_info = _get_debug_info( genetic_algorithm )
 
-        yield generation_index, best_image, best_score, debug_info
+        yield generation_index, best_image, best_score, best_specimen

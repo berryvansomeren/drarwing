@@ -1,19 +1,13 @@
 import copy
-from dataclasses import dataclass
 import random
-from typing import Tuple
+from typing import Tuple, Union
 
 from common.mutation import random_shift_within_range
 
 
 RGBColor = Tuple[ int, int, int ]
-
-
-@dataclass
-class HSVColor:
-    hue         : int
-    saturation  : int
-    value       : int
+HSVColor = Tuple[ int, int, int ]
+Color = Union[RGBColor, HSVColor]
 
 
 rgb_color_black = ( 0, 0, 0 )
@@ -22,13 +16,11 @@ rgb_color_grey  = ( 200, 200, 200 )
 rgb_color_blue  = ( 203, 109, 44  )
 
 
-def random_color():
+def random_hsv_color():
     random_h = random_color_hue()
     random_s = random_color_saturation()
     random_v = random_color_value()
-    hsv_color = HSVColor( random_h, random_s, random_v )
-    # hsv_color = np.array( [ random_h, random_s, random_v ], dtype = 'uint8' ).reshape( 1, 1, 3 )
-    # rgb_color = cv2.cvtColor( hsv_color, cv2.COLOR_HSV2RGB )
+    hsv_color = ( random_h, random_s, random_v )
     return hsv_color
 
 
@@ -46,18 +38,27 @@ def random_color_value() -> int:
 
 
 def random_shift_color_hue( color : HSVColor, max_shift ) -> HSVColor:
-    new_color = copy.deepcopy( color )
-    # hue is cyclical so we use modulus
-    new_color.hue = random.uniform( color.hue - max_shift, color.hue + max_shift ) % 180
+    new_color = (
+        # hue is cyclical so we use modulus
+        random.uniform( color[0] - max_shift, color[0] + max_shift ) % 180,
+        color[1],
+        color[2]
+    )
     return new_color
 
 def random_shift_color_saturation( color : HSVColor, max_shift ) -> HSVColor:
-    new_color = copy.deepcopy( color )
-    new_color.saturation = random_shift_within_range( color.saturation, max_shift, 0, 255 )
+    new_color = (
+        color[0],
+        random_shift_within_range( color[1], max_shift, 0, 255 ),
+        color[2]
+    )
     return new_color
 
 def random_shift_color_value( color : HSVColor, max_shift ) -> HSVColor:
-    new_color = copy.deepcopy( color )
-    new_color.value = random_shift_within_range( color.value, max_shift, 0, 255 )
+    new_color = (
+        color[0],
+        color[1],
+        random_shift_within_range( color[2], max_shift, 0, 255 )
+    )
     return new_color
 
