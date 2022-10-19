@@ -7,14 +7,14 @@ import cv2
 import numpy as np
 
 import common
-from genetic_algorithms.painting import Specimen
+from genetic_algorithms.painting import Painting
 
 
 logger = logging.getLogger(__name__)
 
 
 def redraw_painting(
-        specimen : Specimen,
+        specimen : Painting.Specimen,
         scale: float,
         result_image: np.ndarray
 ) -> np.ndarray:
@@ -50,7 +50,7 @@ def redraw_painting(
                 f'Brush with texture index {brush.texture_index} '
                 f'is desired with size {brush.size}, '
                 f'but has an original size of {original_brush_size}. '
-                'Perhaps you need a lower target resolution, ',
+                'Perhaps you need a lower target resolution, '
                 'or higher resolution brush textures.'
             )
             n_oversized_brushes += 1
@@ -72,7 +72,7 @@ def redraw_painting_with_new_width(
 
     # We can only redraw the specimen if it was written as pickle file
     with open( input_result_pickle_path, 'rb' ) as pickle_file :
-        specimen: Specimen = Specimen(**pickle.load( pickle_file ))
+        specimen = Painting.Specimen(**pickle.load( pickle_file ))
 
     original_image_height, original_image_width = specimen.cached_image.shape[ :2 ]
     scale = new_width / original_image_width

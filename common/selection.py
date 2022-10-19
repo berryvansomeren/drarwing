@@ -1,6 +1,6 @@
 from typing import List, Tuple
 
-from common.genetic_algorithm_interface import Population, FitnessScores
+from common.genetic_algorithm_protocol import Population, FitnessScores
 
 
 def select_top_n( population : List, fitness_scores : FitnessScores, n : int ) -> Tuple[ Population, FitnessScores ]:

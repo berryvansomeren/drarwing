@@ -24,8 +24,8 @@ def draw_ellipse_on_image( ellipse : Ellipse, image : np.ndarray ) -> np.ndarray
         angle = ellipse.angle,
         startAngle = 0,
         endAngle = 360,
-        color = astuple(ellipse.color),
-        thickness = -1,
+        color = ellipse.color,
+        thickness = cv2.FILLED,
         lineType = cv2.LINE_AA
     )
     return image

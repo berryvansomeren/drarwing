@@ -1,6 +1,6 @@
 import numpy as np
 
-from common.genetic_algorithm_interface import FitnessScore
+from common.genetic_algorithm_protocol import FitnessScore
 from common.utils.absolute_difference_image import get_absolute_difference_image
 
 

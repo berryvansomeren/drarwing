@@ -12,7 +12,7 @@ import cv2
 import common
 
 
-logger = logging.getLogger(__file__)
+logger = logging.getLogger(__name__)
 
 
 DECIMALS = 3
@@ -42,6 +42,7 @@ def run_genetic_algorithm_strategy(
                 pickle.dump( best_specimen_raw.__dict__, pickle_file )
 
     logger.info('Running visual genetic algorithm')
+    start_time = datetime.now()
     for generation, best_image_rgb, best_score, best_specimen_raw in genetic_generator:
         current_update_time = datetime.now()
         update_time_microseconds = ( current_update_time - last_update_time ).microseconds
@@ -72,6 +73,9 @@ def run_genetic_algorithm_strategy(
 
         last_rounded_score = rounded_score
 
+    end_time = datetime.now()
+    convergence_time = end_time - start_time
+    logger.info( f'Converged in {convergence_time.seconds} seconds.' )
     logger.info( 'DONE' )
 
 
@@ -85,7 +89,7 @@ def run_genetic_algorithm_by_name(
         input_image_path        : Path,
         output_directory_path   : Path,
         algorithm_file_name     : str,
-        algorithm_arguments     : Dict,
+        algorithm_arguments     : Dict  = {},
         n_iterations_patience   : int   = 100,
         score_interval          : int   = 500,
         is_pickling_desired     : bool  = False,
@@ -100,6 +104,7 @@ def run_genetic_algorithm_by_name(
     os.mkdir( f'{output_directory_path}' )
 
     root_directory_path = Path(__file__).parent.parent
+    logger.info( f'Looking for algorithm with name "{algorithm_file_name}"' )
     algorithm_file_path = Path(f'{root_directory_path}/genetic_algorithms/{algorithm_file_name}.py')
     logger.info( f'Loading algorithm from {algorithm_file_path}' )
     f_get = _load_get_function_from_python_file( algorithm_file_path )

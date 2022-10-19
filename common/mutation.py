@@ -1,6 +1,5 @@
 import random
 
-from common.genetic_algorithm_interface import Population
 
 def mutate_specimen_inplace(
         specimen,

@@ -1,4 +1,4 @@
-from dataclasses import dataclass, astuple
+from dataclasses import dataclass
 import random
 
 import cv2
@@ -19,16 +19,16 @@ class Brush:
     size            : int
 
 
-_g_preloaded_brush_textures : Optional[List ] = None
+PRELOADED_BUSH_TEXTURES : Optional[List ] = None
 
 
 def set_global_brush_textures( brush_textures : List[np.ndarray ] ) -> None:
-    global _g_preloaded_brush_textures
-    _g_preloaded_brush_textures = brush_textures
+    global PRELOADED_BUSH_TEXTURES
+    PRELOADED_BUSH_TEXTURES = brush_textures
 
 
 def get_global_brush_textures() -> List[np.ndarray]:
-    return _g_preloaded_brush_textures
+    return PRELOADED_BUSH_TEXTURES
 
 
 def preload_brush_textures( directory_name : Path ):
@@ -70,12 +70,6 @@ def draw_brush_on_image( brush : Brush, image : np.ndarray ) -> np.ndarray:
     x_max = min( draw_x + brush_width, image_width )
 
     background_subsection = image[y_min:y_max, x_min:x_max]
-    # Note that since we use grayscale images as brushes here,
-    # there is not really a need to cut a section from the foreground image
-    # as the whole foreground image is one solid color
-    # and the texture comes from the alpha part.
-    # However, as this code will be useful when dealing with actual images
-    # I will keep it in.
     foreground_subsection = foreground[
         y_min - draw_y : y_max - draw_y,
         x_min - draw_x : x_max - draw_x
@@ -86,5 +80,5 @@ def draw_brush_on_image( brush : Brush, image : np.ndarray ) -> np.ndarray:
     ]
 
     composite = background_subsection * (1 - alpha_subsection) + foreground_subsection * alpha_subsection
-    image[y_min:y_max, x_min:x_max] = composite
+    image[ y_min:y_max, x_min:x_max ] = composite
     return image

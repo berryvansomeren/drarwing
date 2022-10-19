@@ -1,18 +1,14 @@
-import random
-
 from common.primitives.point import Point
 
+import numpy as np
 
-def sample_weighted_position_from_image( diff_image ):
-    image_height, image_width = diff_image.shape[ :2 ]
 
-    pixel_coords = [ ]
-    pixel_weights = [ ]
-    for y in range( image_height ) :
-        for x in range( image_width ) :
-            pixel_probability = diff_image[ y ][ x ]
-            pixel_coords.append( Point( x, y ) )
-            pixel_weights.append( pixel_probability )
-
-    position = random.choices( pixel_coords, weights = pixel_weights )[ 0 ]
-    return position
+def sample_weighted_position_from_image( diff_image ) -> Point:
+    flat_indices = np.arange( np.product( diff_image.shape ) )
+    flat_weights = diff_image.ravel()
+    sum_weights = np.sum( flat_weights )
+    flat_probabilities = flat_weights / sum_weights
+    random_flat_index = np.random.choice(flat_indices, p=flat_probabilities )
+    # convert 1D index to 2D index
+    position = np.unravel_index( random_flat_index, diff_image.shape )
+    return Point( int( position[1]), int(position[0]) )

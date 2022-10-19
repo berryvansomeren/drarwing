@@ -1,7 +1,7 @@
 import copy
 import random
 
-from common.genetic_algorithm_interface import Population
+from common.genetic_algorithm_protocol import Population
 
 
 def specimen_random_distribute_crossover( parent_1, parent_2 ):
@@ -36,7 +36,7 @@ def random_list_crossover( population : Population ) -> Population:
     offspring = []
     # we create random pairs by randomly shuffling the population and iterating over consecutive pairs
     random.shuffle( population )
-    for parent_1, parent_2 in zip( population[ 0 : :2 ], population[ 1 : :2 ] ) :
+    for parent_1, parent_2 in zip( population[ 0::2 ], population[ 1::2 ] ) :
         children = specimen_random_distribute_crossover( parent_1, parent_2 )
         offspring += children
 
@@ -44,11 +44,10 @@ def random_list_crossover( population : Population ) -> Population:
     return offspring
 
 
-def simple_copy_padding( parent_population, target_size ):
+def asexual_copy_reproduction( parent_population, target_size ):
     n_copies, n_remainder = divmod( target_size, len(parent_population) )
     new_population = []
     for _ in range(n_copies):
         new_population.extend( copy.deepcopy(parent_population))
     new_population.extend( copy.deepcopy(parent_population[:n_remainder]))
     return new_population
-
