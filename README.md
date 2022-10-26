@@ -19,20 +19,15 @@ Every mutation could add a brush stroke to our image, or change the properties o
 
 There are currently three different Genetic Algorithms available in this project, 
 but it has been set up such that it should be easy to create more variations. 
-Because I want to encourage people to modify the python code and not simply invoke existing code, 
-there is no CLI available.
-
-Note that in order to get fast feedback on how the algorithm converges,
-I have actually used a population size of 1 for two of the currently available algorithms. 
-That means that these could also have been written as a for-loop, where it simply accepts or rejects a new brush stroke, based on whether it improves the fitness score. 
-While it might sound like a genetic algorithm overcomplicates things in that regard, 
+Because I can imagine endless configurations and variations of these algorithms I did not think a CLI would be maintainable.
+While a genetic algorithm might not be the optimal way to implement the final versions of these algorithms,
 I have found that it enables tremendous freedom in configuration and exploration of these algorithms and variations.
 
-Other tricks I have used to speed up convergence and improve looks are; 
+Tricks I have used to speed up convergence and improve looks include; 
 using the differences with the target image to further guide the area of mutation,
 using the magnitude of the overall differences to scale modifications,
 and using the gradient of the target image to guide the direction of brush strokes. 
-However, instead of optimizing perfectly we embrace the random number generator,
+However, instead of optimizing perfectly, we embrace the random number generator,
 and allow it to select suboptimal modifications in order to achieve a more artsy effect. 
 
 This project was inspired by:

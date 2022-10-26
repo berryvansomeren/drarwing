@@ -52,7 +52,7 @@ class Painting( common.SimpleGeneticAlgorithmBase ):
     ):
         super().__init__( target_image )
 
-        self.target_gradient = common.HSVImageGradient( self._target_image )
+        self.target_gradient = common.ImageGradient( self._target_image )
         common.preload_brush_textures( Path(brush_directory) )
 
         self.brush_size_multiplier = size_multiplier
@@ -83,7 +83,7 @@ class Painting( common.SimpleGeneticAlgorithmBase ):
 
     def apply_mutation_inplace( self, population : common.Population ):
         for specimen in population:
-            position = common.sample_weighted_position_from_image( specimen.diff_image )
+            position = common.sample_nth_best_position_from_image( specimen.diff_image )
             color = common.get_color_from_image( self._target_image, position )
             texture_index = common.random_brush_texture_index()
             angle = math.degrees( self.target_gradient.get_direction( position ) )

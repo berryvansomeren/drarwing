@@ -6,17 +6,21 @@ import numpy as np
 from common.primitives.point import Point
 
 
-class HSVImageGradient:
+class ImageGradient:
 
-    def __init__( self, hsv_image : np.ndarray, blur_kernel_size = None, blur_magnitude = 0 ) :
+    def __init__( self, image : np.ndarray, is_hsv = False, blur_kernel_size = None, blur_magnitude = 0 ) :
 
         if blur_kernel_size is None :
-            blur_kernel_size = int( min( hsv_image.shape[ :2 ] ) / 50 )
+            blur_kernel_size = int( min( image.shape[ :2 ] ) / 50 )
         if blur_kernel_size % 2 == 0 :
             blur_kernel_size += 1
 
-        rgb = cv2.cvtColor( hsv_image, cv2.COLOR_HSV2RGB )
-        gray = cv2.cvtColor( rgb, cv2.COLOR_RGB2GRAY )
+        if is_hsv:
+            bgr = cv2.cvtColor( image, cv2.COLOR_HSV2BGR )
+            gray = cv2.cvtColor( bgr, cv2.COLOR_BGR2GRAY )
+        else:
+            gray = cv2.cvtColor( image, cv2.COLOR_BGR2GRAY )
+
         dx = cv2.Scharr( gray, cv2.CV_32F, 1, 0 )
         dy = cv2.Scharr( gray, cv2.CV_32F, 0, 1 )
 

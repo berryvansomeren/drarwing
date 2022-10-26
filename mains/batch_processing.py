@@ -1,7 +1,9 @@
+import itertools
 import logging
 from pathlib import Path
 
 import common
+
 
 ROOT_DIR                        = Path( __file__ ).parent.parent
 DEFAULT_INPUT_IMAGE_PATH        = ROOT_DIR / '_input_images'
@@ -9,33 +11,39 @@ DEFAULT_OUTPUT_DIRECTORY_PATH   = ROOT_DIR / 'results'
 DEFAULT_BRUSH_DIRECTORY         = ROOT_DIR / '_input_images/brushes'
 
 
+UNSPLASH_IMAGES = [
+    "calvin-mano-CXS27RrJObQ-unsplash.jpg",
+    "damian-patkowski-T-LfvX-7IVg-unsplash.jpg",
+    "elisa-stone-ceKhGIXOGtA-unsplash.jpg",
+    "faris-mohammed-jeRcm7wI-Hw-unsplash.jpg",
+    "jaime-spaniol-RvV6qccrbkA-unsplash.jpg",
+    "jeremy-bishop-rigCO5cf22I-unsplash.jpg",
+    "pine-watt-2Hzmz15wGik-unsplash.jpg",
+    "ricardo-frantz-D9lDqguxy4Y-unsplash.jpg",
+    "sagar-kulkarni-8Td8zBzoAfM-unsplash.jpg",
+    "tim-mossholder-cO5-QcKIR9o-unsplash.jpg",
+    "bailey-zindel-NRQV-hBF10M-unsplash.jpg",
+]
+
+
 def painting():
-    # We invoke the same algorithm multiple times
-    # with slightly different arguments.
-    # This helper function removes some repetition for us
-    def make_args(
-            output_name: str,
-            image_name : str,
-            brushes_name : str,
-    ):
-        return {
+    brush_names = [
+        'sketch',
+        'canvas',
+        'watercolor',
+        'oil',
+    ]
+    for image_name, brush_name in itertools.product( UNSPLASH_IMAGES, brush_names ):
+        args = {
             'input_image_path' : DEFAULT_INPUT_IMAGE_PATH / image_name,
-            'output_directory_path' : DEFAULT_OUTPUT_DIRECTORY_PATH / output_name,
+            'output_directory_path' : DEFAULT_OUTPUT_DIRECTORY_PATH / f'{Path(image_name).stem}__{brush_name}',
             'algorithm_file_name' : 'painting',
-            'is_pickling_desired' : True,
+            'is_pickling_desired' : False,
             'algorithm_arguments': {
-                'brush_directory' : DEFAULT_BRUSH_DIRECTORY / brushes_name,
+                'brush_directory' : DEFAULT_BRUSH_DIRECTORY / brush_name,
             },
         }
-
-    args = [
-        make_args( 'ship_sketch',       'ship.jpg', 'sketch' ),
-        make_args( 'ship_canvas',       'ship.jpg', 'canvas' ),
-        make_args( 'ship_watercolor',   'ship.jpg', 'watercolor' ),
-        make_args( 'ship_oil',          'ship.jpg', 'oil' ),
-    ]
-    for arg_pack in args:
-        common.run_genetic_algorithm_by_name(**arg_pack)
+        common.run_genetic_algorithm_by_name( **args )
 
 
 def abstract():
@@ -49,17 +57,26 @@ def abstract():
 
 
 def pointillism():
-    arg_pack = {
-        'input_image_path' : DEFAULT_INPUT_IMAGE_PATH / 'mario_yoshi.jpg',
-        'output_directory_path' : DEFAULT_OUTPUT_DIRECTORY_PATH / 'mario_pointillism',
-        'algorithm_file_name' : 'pointillism',
-        'is_pickling_desired' : True,
-    }
-    common.run_genetic_algorithm_by_name(**arg_pack)
+    arg_packs = [
+        {
+            'input_image_path' : DEFAULT_INPUT_IMAGE_PATH / 'mario_yoshi.jpg',
+            'output_directory_path' : DEFAULT_OUTPUT_DIRECTORY_PATH / 'mario_pointillism',
+            'algorithm_file_name' : 'pointillism',
+            'is_pickling_desired' : True,
+        },
+        {
+            'input_image_path' : DEFAULT_INPUT_IMAGE_PATH / 'mario_yoshi.jpg',
+            'output_directory_path' : DEFAULT_OUTPUT_DIRECTORY_PATH / 'mario_pointillism',
+            'algorithm_file_name' : 'pointillism',
+            'is_pickling_desired' : True,
+        }
+    ]
+    for args in arg_packs:
+        common.run_genetic_algorithm_by_name(**args)
 
 
 if __name__ == '__main__':
     logging.basicConfig( level = logging.INFO )
-    #painting()
+    painting()
     #pointillism()
-    abstract()
+    #abstract()

@@ -75,9 +75,9 @@ def random_shift_color_value( color : HSVColor, max_shift ) -> HSVColor:
     return new_color
 
 
-def get_blank_image_like( example_image, is_hsv = False ) -> Image:
+def get_blank_image_like( example_image, use_hsv = False ) -> Image:
     blank_image = np.zeros_like( example_image )
     blank_image.fill( 255 )
-    if is_hsv:
+    if use_hsv:
         blank_image = cv2.cvtColor( blank_image, cv2.COLOR_BGR2HSV )
     return blank_image

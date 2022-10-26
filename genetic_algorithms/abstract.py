@@ -67,7 +67,7 @@ class Abstract( common.SimpleGeneticAlgorithmBase ):
 
     def get_initial_population( self ) -> common.Population:
         # we store the blank hsv image to make it easy to reuse later
-        self._blank_hsv_image = common.get_blank_image_like( self._target_image, is_hsv = True )
+        self._blank_hsv_image = common.get_blank_image_like( self._target_image, use_hsv = True )
         absolute_difference_image = common.get_absolute_difference_image( self._blank_hsv_image, self._target_image )
 
         initial_population = []
