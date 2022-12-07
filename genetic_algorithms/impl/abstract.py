@@ -6,10 +6,10 @@ from typing import List
 import cv2
 import numpy as np
 
-import common
+import genetic_algorithms.common as GA_common
 
 
-class Abstract( common.SimpleGeneticAlgorithmBase ):
+class Abstract( GA_common.SimpleGeneticAlgorithmBase ):
 
     """
     Abstract
@@ -26,7 +26,7 @@ class Abstract( common.SimpleGeneticAlgorithmBase ):
 
     @dataclass
     class Specimen :
-        genes: List[ common.Circle ]
+        genes: List[ GA_common.Circle ]
         diff_image: np.ndarray
         cached_image: np.ndarray
 
@@ -52,23 +52,23 @@ class Abstract( common.SimpleGeneticAlgorithmBase ):
     def _get_random_circle_radius( self ) -> float:
         return random.randint( self._min_radius, self._max_radius )
 
-    def _get_random_circle( self, diff_image ) -> common.Circle:
+    def _get_random_circle( self, diff_image ) -> GA_common.Circle:
 
-        position = common.sample_weighted_position_from_image( diff_image )
-        color = common.get_color_from_image( self._target_image, position )
+        position = GA_common.sample_weighted_position_from_image( diff_image )
+        color = GA_common.get_color_from_image( self._target_image, position )
         radius = self._get_random_circle_radius()
 
-        circle = common.Circle(
+        circle = GA_common.Circle(
             color = color,
             position = position,
             radius = radius,
         )
         return circle
 
-    def get_initial_population( self ) -> common.Population:
+    def get_initial_population( self ) -> GA_common.Population:
         # we store the blank hsv image to make it easy to reuse later
-        self._blank_hsv_image = common.get_blank_image_like( self._target_image, use_hsv = True )
-        absolute_difference_image = common.get_absolute_difference_image( self._blank_hsv_image, self._target_image )
+        self._blank_hsv_image = GA_common.get_blank_image_like( self._target_image, use_hsv = True )
+        absolute_difference_image = GA_common.get_absolute_difference_image( self._blank_hsv_image, self._target_image )
 
         initial_population = []
         for _i_specimen in range( self._n_population ):
@@ -79,51 +79,51 @@ class Abstract( common.SimpleGeneticAlgorithmBase ):
         return initial_population
 
 
-    def apply_mutation_inplace( self, population : common.Population ):
+    def apply_mutation_inplace( self, population : GA_common.Population ):
 
         # color
-        def mutation__shift_color_hue( circle : common.Circle ) -> None:
-            circle.color = common.random_shift_color_hue( color = circle.color, max_shift = 3 )
+        def mutation__shift_color_hue( circle : GA_common.Circle ) -> None:
+            circle.color = GA_common.random_shift_color_hue( color = circle.color, max_shift = 3 )
 
-        def mutation__shift_color_saturation( circle : common.Circle ) -> None:
-            circle.color = common.random_shift_color_saturation( color = circle.color, max_shift = 5 )
+        def mutation__shift_color_saturation( circle : GA_common.Circle ) -> None:
+            circle.color = GA_common.random_shift_color_saturation( color = circle.color, max_shift = 5 )
 
-        def mutation__shift_color_value( circle : common.Circle ) -> None:
-            circle.color = common.random_shift_color_value( color = circle.color, max_shift = 5 )
+        def mutation__shift_color_value( circle : GA_common.Circle ) -> None:
+            circle.color = GA_common.random_shift_color_value( color = circle.color, max_shift = 5 )
 
-        def mutation__random_color( circle : common.Circle ) -> None:
-            circle.color = common.random_hsv_color()
+        def mutation__random_color( circle : GA_common.Circle ) -> None:
+            circle.color = GA_common.random_hsv_color()
 
         # position
-        def mutation__shift_position_x( circle : common.Circle ) -> None:
-            circle.position.x = int( common.random_shift_within_range(
+        def mutation__shift_position_x( circle : GA_common.Circle ) -> None:
+            circle.position.x = int( GA_common.random_shift_within_range(
                 value = circle.position.x,
                 max_shift = 10,
                 range_min = 0,
                 range_max = self._width
             ) )
 
-        def mutation__shift_position_y( circle : common.Circle ) -> None:
-            circle.position.y = int( common.random_shift_within_range(
+        def mutation__shift_position_y( circle : GA_common.Circle ) -> None:
+            circle.position.y = int( GA_common.random_shift_within_range(
                 value = circle.position.y,
                 max_shift = 10,
                 range_min = 0,
                 range_max = self._height
             ) )
 
-        def mutation__random_position( circle : common.Circle ) -> None:
-            circle.position = common.random_point( self._width, self._height )
+        def mutation__random_position( circle : GA_common.Circle ) -> None:
+            circle.position = GA_common.random_point( self._width, self._height )
 
         # radius
-        def mutation__shift_radius( circle : common.Circle ) -> None:
-            circle.radius = int( common.random_shift_within_range(
+        def mutation__shift_radius( circle : GA_common.Circle ) -> None:
+            circle.radius = int( GA_common.random_shift_within_range(
                 value = circle.radius,
                 max_shift = 3,
                 range_min = self._min_radius,
                 range_max = self._max_radius
             ) )
 
-        def mutation__random_radius( circle : common.Circle ) -> None:
+        def mutation__random_radius( circle : GA_common.Circle ) -> None:
             circle.radius = self._get_random_circle_radius()
 
         weighted_mutations = (
@@ -142,7 +142,7 @@ class Abstract( common.SimpleGeneticAlgorithmBase ):
         )
 
         for specimen in population :
-            common.mutate_specimen_inplace(
+            GA_common.mutate_specimen_inplace(
                 specimen,
                 weighted_mutations,
                 lambda : self._get_random_circle( specimen.diff_image ),
@@ -151,7 +151,7 @@ class Abstract( common.SimpleGeneticAlgorithmBase ):
             )
 
 
-    def get_fitness( self, population : common.Population ) -> common.FitnessScores:
+    def get_fitness( self, population : GA_common.Population ) -> GA_common.FitnessScores:
         # super class expects a cached image per specimen,
         # we have to update that image here,
         # before using the super class method for getting fitness scores
@@ -160,7 +160,7 @@ class Abstract( common.SimpleGeneticAlgorithmBase ):
             # because any gene could have been mutated
             specimen.cached_image = copy.deepcopy( self._blank_hsv_image )
             for circle in specimen.genes:
-                common.draw_circle_on_image( circle, specimen.cached_image )
+                GA_common.draw_circle_on_image( circle, specimen.cached_image )
 
         return super().get_fitness( population )
 

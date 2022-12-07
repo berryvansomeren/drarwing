@@ -3,8 +3,8 @@ from dataclasses import dataclass, astuple
 import cv2
 import numpy as np
 
-from common.primitives.color import HSVColor
-from common.primitives.point import Point
+from primitives.color import HSVColor
+from primitives.point import Point
 
 
 @dataclass

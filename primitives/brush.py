@@ -6,8 +6,8 @@ import numpy as np
 from pathlib import Path
 from typing import Optional, List
 
-from common.primitives.color import Color
-from common.primitives.point import Point
+from primitives.color import Color
+from primitives.point import Point
 
 
 @dataclass

@@ -1,7 +1,7 @@
 import numpy as np
 
-from common.genetic_algorithm_protocol import FitnessScore
-from common.utils.absolute_difference_image import get_absolute_difference_image
+from genetic_algorithms.common.genetic_algorithm_protocol import FitnessScore
+from utils.absolute_difference_image import get_absolute_difference_image
 
 
 def get_fitness_as_absolute_image_difference( specimen_image, target_image ) -> FitnessScore:

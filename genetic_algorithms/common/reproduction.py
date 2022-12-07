@@ -1,7 +1,7 @@
 import copy
 import random
 
-from common.genetic_algorithm_protocol import Population
+from genetic_algorithms.common.genetic_algorithm_protocol import Population
 
 
 def specimen_random_distribute_crossover( parent_1, parent_2 ):

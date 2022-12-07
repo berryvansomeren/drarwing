@@ -1,6 +1,6 @@
 import random
 
-from common.genetic_algorithm_protocol import GeneticAlgorithm
+from genetic_algorithms.common.genetic_algorithm_protocol import GeneticAlgorithm
 from typing import Generator
 
 import numpy as np

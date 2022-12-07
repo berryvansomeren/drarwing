@@ -1,14 +1,24 @@
 import copy
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 import math
 
 import cv2
 import numpy as np
 
-import common
+from genetic_algorithms.common.genetic_algorithm_protocol import Population
+from genetic_algorithms.common.simple_genetic_algorithm_base import SimpleGeneticAlgorithmBase
+from primitives.ellipse import Ellipse, draw_ellipse_on_image
+from primitives.color import get_blank_image_like
+from utils import (
+    ImageGradient,
+    ColorPalette,
+    get_absolute_difference_image,
+    get_color_from_image,
+    sample_weighted_position_from_image,
+)
 
 
-class Pointillism( common.SimpleGeneticAlgorithmBase ):
+class Pointillism( SimpleGeneticAlgorithmBase ):
 
     """
     Pointillism
@@ -25,6 +35,8 @@ class Pointillism( common.SimpleGeneticAlgorithmBase ):
         cached_image: np.ndarray
         diff_image: np.ndarray
 
+        genes: list[ Ellipse ] = field( default_factory = list )
+
 
     def __init__(
             self,
@@ -38,8 +50,8 @@ class Pointillism( common.SimpleGeneticAlgorithmBase ):
         if self.use_hsv:
             target_image = cv2.cvtColor( target_image, cv2.COLOR_BGR2HSV )
         super().__init__(target_image)
-        self._target_gradient = common.ImageGradient( self._target_image, is_hsv = self.use_hsv )
-        self._color_palette = common.ColorPalette( self._target_image )
+        self._target_gradient = ImageGradient( self._target_image, is_hsv = self.use_hsv )
+        self._color_palette = ColorPalette( self._target_image )
 
         if short_axis_size is None:
             # size of dots is based on shortest extend of width and height
@@ -51,9 +63,9 @@ class Pointillism( common.SimpleGeneticAlgorithmBase ):
         self._long_axis_multiplier = long_axis_multiplier
         self._long_axis_exponent = long_axis_exponent
 
-    def get_initial_population( self ) -> common.Population:
-        blank_image = common.get_blank_image_like( self._target_image, use_hsv = self.use_hsv )
-        abs_diff_image = common.get_absolute_difference_image( blank_image, self._target_image )
+    def get_initial_population( self ) -> Population:
+        blank_image = get_blank_image_like( self._target_image, use_hsv = self.use_hsv )
+        abs_diff_image = get_absolute_difference_image( blank_image, self._target_image )
 
         initial_population = [
             self.Specimen( cached_image = copy.deepcopy( blank_image ), diff_image = abs_diff_image )
@@ -62,8 +74,8 @@ class Pointillism( common.SimpleGeneticAlgorithmBase ):
         return initial_population
 
     def _sample_new_ellipse( self, diff_image ):
-        position = common.sample_weighted_position_from_image( diff_image )
-        target_color = common.get_color_from_image( self._target_image, position )
+        position = sample_weighted_position_from_image( diff_image )
+        target_color = get_color_from_image( self._target_image, position )
         color = self._color_palette.get_matching_color_with_probabilities( target_color )
         angle = self._target_gradient.get_direction( position ) + 90
 
@@ -71,17 +83,18 @@ class Pointillism( common.SimpleGeneticAlgorithmBase ):
         long_axis_addition = self._long_axis_multiplier * ( gradient_magnitude ** self._long_axis_exponent )
         long_axis = int( math.ceil( self._short_axis_size + long_axis_addition ) )
 
-        return common.Ellipse(
+        return Ellipse(
             color = color,
             position = position,
             axes = ( long_axis, self._short_axis_size ),
             angle = angle,
         )
 
-    def apply_mutation_inplace( self, population : common.Population ):
+    def apply_mutation_inplace( self, population : Population ):
         for specimen in population:
             new_ellipse = self._sample_new_ellipse( specimen.diff_image )
-            common.draw_ellipse_on_image( new_ellipse, specimen.cached_image )
+            specimen.genes.append(new_ellipse)
+            draw_ellipse_on_image( new_ellipse, specimen.cached_image )
 
     def get_specimen_image_rgb( self, specimen: Specimen ) -> np.ndarray:
         # Since we work in HSV color space for this algorithm,

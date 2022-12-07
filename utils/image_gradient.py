@@ -3,12 +3,12 @@ import math
 
 import numpy as np
 
-from common.primitives.point import Point
+from primitives.point import Point
 
 
 class ImageGradient:
 
-    def __init__( self, image : np.ndarray, is_hsv = False, blur_kernel_size = None, blur_magnitude = 0 ) :
+    def __init__( self, image : np.ndarray, is_hsv : bool = False, blur_kernel_size = None, blur_magnitude = 0 ) :
 
         if blur_kernel_size is None :
             blur_kernel_size = int( min( image.shape[ :2 ] ) / 50 )
@@ -29,14 +29,14 @@ class ImageGradient:
         self._dy = cv2.GaussianBlur( dy, blur_kernel_size_2d, blur_magnitude )
 
 
-    def get_direction( self, position : Point ):
+    def get_direction( self, position : Point ) -> float:
         dy = self._dy[position.y,position.x]
         dx = self._dx[position.y,position.x]
         direction = math.degrees( math.atan2( dy, dx ) )
         return direction
 
 
-    def get_magnitude( self, position : Point ):
+    def get_magnitude( self, position : Point ) -> float:
         dy = self._dy[position.y,position.x]
         dx = self._dx[position.y,position.x]
         magnitude = math.hypot( dy, dx )

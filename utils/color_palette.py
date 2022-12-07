@@ -3,13 +3,13 @@ import random
 import numpy as np
 from sklearn.cluster import KMeans
 
-from common.primitives.color import HSVColor
+from primitives.color import HSVColor
 
 
 DEFAULT_COLOR_DELTAS = itertools.product(
-    [ 0, 10, -10 ], # Hue deltas
-    [ 0, 10, -10 ], # Saturation deltas
-    [ 0, 10, -10 ], # Value deltas
+    [ 0, 10, -10 ], # B or Hue deltas
+    [ 0, 10, -10 ], # G or Saturation deltas
+    [ 0, 10, -10 ], # R or Value deltas
 )
 
 

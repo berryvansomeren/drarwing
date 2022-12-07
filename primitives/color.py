@@ -1,22 +1,16 @@
 import random
 from typing import Tuple, Union
 
-from common.genetic_algorithm_protocol import Image
-from common.mutation import random_shift_within_range
+from genetic_algorithms.common.genetic_algorithm_protocol import Image
+from utils.random_shift_within_range import random_shift_within_range
 
 import cv2
 import numpy as np
 
 
-RGBColor = Tuple[ int, int, int ]
+BGRColor = Tuple[ int, int, int ]
 HSVColor = Tuple[ int, int, int ]
-Color = Union[RGBColor, HSVColor]
-
-
-rgb_color_black = ( 0, 0, 0 )
-rgb_color_white = ( 255, 255, 255 )
-rgb_color_grey  = ( 200, 200, 200 )
-rgb_color_blue  = ( 203, 109, 44  )
+Color = Union[ BGRColor, HSVColor ]
 
 
 def random_hsv_color():
@@ -50,7 +44,7 @@ def random_color_value() -> int:
 def random_shift_color_hue( color : HSVColor, max_shift ) -> HSVColor:
     new_color = (
         # hue is cyclical so we use modulus
-        random.uniform( color[0] - max_shift, color[0] + max_shift ) % 180,
+        int(random.uniform( color[0] - max_shift, color[0] + max_shift ) % 180),
         color[1],
         color[2]
     )
@@ -60,7 +54,7 @@ def random_shift_color_hue( color : HSVColor, max_shift ) -> HSVColor:
 def random_shift_color_saturation( color : HSVColor, max_shift ) -> HSVColor:
     new_color = (
         color[0],
-        random_shift_within_range( color[1], max_shift, 0, 255 ),
+        int(random_shift_within_range( color[1], max_shift, 0, 255 )),
         color[2]
     )
     return new_color
@@ -70,7 +64,7 @@ def random_shift_color_value( color : HSVColor, max_shift ) -> HSVColor:
     new_color = (
         color[0],
         color[1],
-        random_shift_within_range( color[2], max_shift, 0, 255 )
+        int(random_shift_within_range( color[2], max_shift, 0, 255 ))
     )
     return new_color
 

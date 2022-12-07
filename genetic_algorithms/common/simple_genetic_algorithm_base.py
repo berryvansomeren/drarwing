@@ -1,11 +1,12 @@
 from typing import Tuple
 from abc import ABC, abstractmethod
 
-from common.reproduction import asexual_copy_reproduction
-from common.fitness import get_absolute_difference_image, get_fitness_from_absolute_difference_image
-from common.selection import select_top_n
+from genetic_algorithms.common.reproduction import asexual_copy_reproduction
+from genetic_algorithms.common.fitness import get_fitness_from_absolute_difference_image
+from genetic_algorithms.common.selection import select_top_n
+from utils.absolute_difference_image import get_absolute_difference_image
 
-from common.genetic_algorithm_protocol import (
+from genetic_algorithms.common.genetic_algorithm_protocol import (
     Specimen,
     Population,
     FitnessScores,
