@@ -3,8 +3,28 @@
 Drawing using Darwinian principles.  
 We use the principles of reproduction, mutation and survival of the fittest to evolve beautiful images.
 
+<div align="center">
+    <img src="_doc/drarwing_ship.gif" width="70%">
+</div>
+
 ## Gallery
 Some examples of results. The code for all of these can be found in _mains/batch_processing.py_.
+
+<div align="center">
+    <div>
+        <img src="_doc/_calvin-mano-CXS27RrJObQ-unsplash__oil__final_result_4k.png" width="70%">
+    </div>
+    <div>
+        <img src="_doc/_elisa-stone-ceKhGIXOGtA-unsplash__canvas__final_result_4k.png" width="40%">
+    </div>
+    <div>
+        <img src="_doc/_pine-watt-2Hzmz15wGik-unsplash__watercolor__final_result_4k.png" width="70%">
+    </div>
+    <div>
+        <img src="_doc/_ricardo-frantz-D9lDqguxy4Y-unsplash__sketch__final_result_4k.png" width="40%">
+    </div>
+</div>
+
 
 ## Evolution of Images
 Darwin defined evolution as "descent with modification". 
@@ -18,8 +38,7 @@ The DNA of our image defines what brush strokes to make on a canvas to paint the
 Every mutation could add a brush stroke to our image, or change the properties of an already existing brush stroke.
 
 There are currently three different Genetic Algorithms available in this project, 
-but it has been set up such that it should be easy to create more variations. 
-Because I can imagine endless configurations and variations of these algorithms I did not think a CLI would be maintainable.
+but it has been set up such that it should be easy to create more variations.
 While a genetic algorithm might not be the optimal way to implement the final versions of these algorithms,
 I have found that it enables tremendous freedom in configuration and exploration of these algorithms and variations.
 
