@@ -130,6 +130,5 @@ dmypy.json
 
 .idea/
 
-_input_images/
 results/
 results_to_keep/

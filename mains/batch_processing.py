@@ -93,12 +93,6 @@ def pointillism():
     ]
     for args in arg_packs:
         result = run_genetic_algorithm_by_name( **args )
-
-    # result_file_path = 'C:/Users/Berry/Documents/development/drarwing/results/city_1_pointillism/gen_154279__dt_15651_ms__score_8347.pickle'
-    # with open( result_file_path, "rb" ) as pickle_file:
-    #     result = pickle.load(pickle_file)
-    #     result = Pointillism.Specimen( **result )
-    #
         result_4k = redraw_pointillism_at_4k(result)
 
         output_path_4k = f'{arg_packs[0]["output_directory_path"]}/final_result_4k.png'
@@ -108,6 +102,6 @@ def pointillism():
 
 if __name__ == '__main__':
     logging.basicConfig( level = logging.INFO )
-    #painting()
+    painting()
     pointillism()
-    #abstract()
+    abstract()
