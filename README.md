@@ -1,5 +1,7 @@
 # D(r)a[r]win(g)
 
+(Also see my blogposts [**here**](https://www.berryvansomeren.com/posts/drarwing), and [**here**](https://www.berryvansomeren.com/posts/drarwing_extra))
+
 Drawing using Darwinian principles.  
 We use the principles of reproduction, mutation and survival of the fittest to evolve beautiful images.
 
@@ -15,13 +17,25 @@ Some examples of results. The code for all of these can be found in _mains/batch
         <img src="_doc/_calvin-mano-CXS27RrJObQ-unsplash__oil__final_result_4k.png" width="70%">
     </div>
     <div>
-        <img src="_doc/_elisa-stone-ceKhGIXOGtA-unsplash__canvas__final_result_4k.png" width="40%">
+        <img src="_doc/_elisa-stone-ceKhGIXOGtA-unsplash__canvas__final_result_4k.png" width="50%">
     </div>
     <div>
         <img src="_doc/_pine-watt-2Hzmz15wGik-unsplash__watercolor__final_result_4k.png" width="70%">
     </div>
     <div>
-        <img src="_doc/_ricardo-frantz-D9lDqguxy4Y-unsplash__sketch__final_result_4k.png" width="40%">
+        <img src="_doc/_ricardo-frantz-D9lDqguxy4Y-unsplash__sketch__final_result_4k.png" width="50%">
+    </div>
+    <div>
+        <img src="_doc/fox_hsv.png" width="70%">
+    </div>
+    <div>
+        <img src="_doc/fish_hsv.png" width="70%">
+    </div>
+    <div>
+        <img src="_doc/elk_hsv.png" width="50%">
+    </div>
+    <div>
+        <img src="_doc/parrot_hsv.png" width="70%">
     </div>
 </div>
 
@@ -36,11 +50,6 @@ We can use a similar process to achieve arbitrary goals as long as we modify our
 In this project "fitness" simply measures how well an image approximates a target image.
 The DNA of our image defines what brush strokes to make on a canvas to paint the image. 
 Every mutation could add a brush stroke to our image, or change the properties of an already existing brush stroke.
-
-There are currently three different Genetic Algorithms available in this project, 
-but it has been set up such that it should be easy to create more variations.
-While a genetic algorithm might not be the optimal way to implement the final versions of these algorithms,
-I have found that it enables tremendous freedom in configuration and exploration of these algorithms and variations.
 
 Tricks I have used to speed up convergence and improve looks include; 
 using the differences with the target image to further guide the area of mutation,
