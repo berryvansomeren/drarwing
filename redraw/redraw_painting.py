@@ -4,8 +4,7 @@ from pathlib import Path
 
 import numpy as np
 
-from primitives import Image, Point, Brush
-from primitives.brush import get_global_brush_textures, draw_brush_on_image, preload_brush_textures
+from primitives import Image, Point, Brush, get_global_brush_textures, draw_brush_on_image, preload_brush_textures
 from redraw.utils import get_scale_for_4k_from_image
 from genetic_algorithms.impl.painting import Painting
 

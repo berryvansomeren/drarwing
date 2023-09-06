@@ -1,15 +1,15 @@
 import random
-from typing import Tuple, Union
+from typing import NewType, Union
 
-from genetic_algorithms.common.genetic_algorithm_protocol import Image
-from utils.random_shift_within_range import random_shift_within_range
+from primitives.image import Image
+from utils import random_shift_within_range
 
 import cv2
 import numpy as np
 
 
-BGRColor = Tuple[ int, int, int ]
-HSVColor = Tuple[ int, int, int ]
+BGRColor = NewType( 'BGRColor', tuple[ int, int, int ] )
+HSVColor = NewType( 'HSVColor', tuple[ int, int, int ] )
 Color = Union[ BGRColor, HSVColor ]
 
 

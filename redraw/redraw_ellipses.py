@@ -1,50 +1,41 @@
-import math
-
+import cv2
 import numpy as np
+import svgwrite
 
-from primitives import Image, Point
-from primitives.ellipse import Ellipse, draw_ellipse_on_image_as_bgr
-from redraw.utils import get_scale_for_4k_from_image
 from genetic_algorithms.impl.pointillism import Pointillism
 
 
-def _redraw_ellipses(
-        ellipses : list[Ellipse],
-        scale: float,
-        result_image: np.ndarray,
-) -> Image:
-
-    def int_scale(v):
-        return int( v * scale )
-
-    for ellipse in ellipses:
-        ellipse.size = ( int_scale(ellipse.axes[0]), int_scale(ellipse.axes[1]) )
-        ellipse.position = Point(
-            int_scale(ellipse.position.x),
-            int_scale(ellipse.position.y),
-        )
-        draw_ellipse_on_image_as_bgr( ellipse, result_image )
-
-    return result_image
+def bgr_to_svg_color(rgb):
+    return f'rgb({int(round(rgb[2]))},{int(round(rgb[1]))},{int(round(rgb[0]))})'
 
 
-def redraw_pointillism_at_4k(
-        specimen : Pointillism.Specimen
+def hsv_to_svg_color(hsv):
+    bgr_color = cv2.cvtColor(np.uint8([[hsv]]), cv2.COLOR_HSV2BGR)[0][0]
+    return bgr_to_svg_color(bgr_color)
+
+
+def redraw_pointillism_as_svg(
+        specimen : Pointillism.Specimen,
+        use_hsv : bool,
+        ellipse_scale : float,
 ):
-    scale = get_scale_for_4k_from_image( specimen.cached_image )
+    svg_image = svgwrite.Drawing( profile = 'full' )
 
-    result_image_shape = (
-        math.ceil( specimen.cached_image.shape[0] * scale ),
-        math.ceil( specimen.cached_image.shape[1] * scale ),
-        3
-    )
-    result_image = np.zeros( result_image_shape, dtype = np.uint8 )
-    result_image.fill(255)
+    for ellipse in specimen.genes:
+        if use_hsv:
+            svg_color = hsv_to_svg_color( ellipse.color )
+        else:
+            svg_color = bgr_to_svg_color( ellipse.color )
 
-    result = _redraw_ellipses(
-        specimen.genes,
-        scale,
-        result_image
-    )
+        svg_position = ( ellipse.position.x, ellipse.position.y )
 
-    return result
+        svg_ellipse = svg_image.ellipse(
+            center = svg_position,
+            r = ( ellipse.axes[0] * ellipse_scale, ellipse.axes[1] * ellipse_scale ),
+            fill = svg_color
+        )
+        svg_ellipse.rotate( ellipse.angle, svg_position )
+
+        svg_image.add( svg_ellipse )
+
+    return svg_image

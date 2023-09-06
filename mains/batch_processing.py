@@ -1,11 +1,9 @@
 import itertools
 import logging
-import pickle
 from pathlib import Path
 
-from genetic_algorithms.common.run import run_genetic_algorithm_by_name, run_genetic_algorithm_pointillism
-from redraw import redraw_painting_at_4k, redraw_pointillism_at_4k
-from genetic_algorithms.impl.pointillism import Pointillism
+from genetic_algorithms.common.run import run_genetic_algorithm_by_name
+from redraw import redraw_painting_at_4k, redraw_pointillism_as_svg
 
 import cv2
 
@@ -83,25 +81,42 @@ CITIES_IMAGES = [
 
 
 def pointillism():
-    arg_packs = [
-        {
-            'input_image_path' : DEFAULT_INPUT_IMAGE_PATH / 'cities/pawel-nolbert-4u2U8EO9OzY-unsplash.jpg',
-            'output_directory_path' : DEFAULT_OUTPUT_DIRECTORY_PATH / 'city_1_pointillism',
+    images = [
+        # 'tim-mossholder-cO5-QcKIR9o-unsplash.jpg',
+        # 'david-clode-oTMGUchAwTQ-unsplash.jpg',
+        # 'hasse-lossius-j9CIeJZIECk-unsplash.jpg',
+        # 'olga-kononenko-Ltyfaze30SA-unsplash.jpg',
+        'andrew-ly-5AftAzShDDQ-unsplash.jpg',
+    ]
+    for image_name in images:
+        image_directory_name = f'{Path( image_name ).stem}'
+        output_directory_path = DEFAULT_OUTPUT_DIRECTORY_PATH / image_directory_name
+        use_hsv = True
+        args = {
+            'input_image_path' : DEFAULT_INPUT_IMAGE_PATH / image_name,
+            'output_directory_path' : output_directory_path,
             'algorithm_file_name' : 'pointillism',
             'is_pickling_desired' : True,
-        },
-    ]
-    for args in arg_packs:
-        result = run_genetic_algorithm_by_name( **args )
-        result_4k = redraw_pointillism_at_4k(result)
+            'algorithm_arguments' : {
+                'out_path_color_palette' : f'{output_directory_path}/{"color_palette.png"}',
+                'use_hsv' : use_hsv,
+            },
+        }
 
-        output_path_4k = f'{arg_packs[0]["output_directory_path"]}/final_result_4k.png'
-        cv2.imwrite( output_path_4k, result_4k )
-        logger.info( f'Wrote 4k result to {output_path_4k}' )
+        result = run_genetic_algorithm_by_name( **args )
+        result_image = result.cached_image
+        if use_hsv:
+            result_image = cv2.cvtColor( result_image, cv2.COLOR_HSV2BGR )
+
+        out_path_without_extension = f'{output_directory_path}/final_result'
+        cv2.imwrite( f'{out_path_without_extension}.png', result_image )
+        result_svg = redraw_pointillism_as_svg( result, use_hsv )
+        result_svg.saveas( f'{out_path_without_extension}.svg' )
+        logger.info( f'Wrote final results to {out_path_without_extension}' )
 
 
 if __name__ == '__main__':
     logging.basicConfig( level = logging.INFO )
-    painting()
+    # painting()
     pointillism()
-    abstract()
+    # abstract()

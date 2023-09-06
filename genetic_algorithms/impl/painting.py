@@ -4,12 +4,11 @@ import math
 from pathlib import Path
 from typing import List
 
-from genetic_algorithms.common.genetic_algorithm_protocol import Image, Population, FitnessScores
-from genetic_algorithms.common.simple_genetic_algorithm_base import SimpleGeneticAlgorithmBase
-from primitives.brush import Brush, preload_brush_textures, draw_brush_on_image, random_brush_texture_index
-from utils.image_gradient import ImageGradient
+import genetic_algorithms.common as GA_common
+import primitives
+import utils
 
-class Painting( SimpleGeneticAlgorithmBase ):
+class Painting( GA_common.SimpleGeneticAlgorithmBase ):
 
     """
     Iterative Painting
@@ -24,8 +23,8 @@ class Painting( SimpleGeneticAlgorithmBase ):
 
     @dataclass
     class Specimen :
-        cached_image: Image
-        diff_image: Image
+        cached_image: primitives.Image
+        diff_image: primitives.Image
 
         # We normally do not store fitness scores inside the specimen
         # But we do for this algorithm,
@@ -38,13 +37,13 @@ class Painting( SimpleGeneticAlgorithmBase ):
         # But storing this info allows for better inspection,
         # and to later redraw the image with different settings, if pickled.
         # For that, see common.redraw.redraw_painting
-        brushes: List[ Brush ] = field( default_factory = list )
+        brushes: List[ primitives.Brush ] = field( default_factory = list )
 
 
     def __init__(
             self,
-            target_image    : Image,
-            brush_directory     : str,
+            target_image    : primitives.Image,
+            brush_directory : str,
 
             # these are fun to play around with
             # configure the size multiplier to get more coarse or finegrained results
@@ -54,14 +53,14 @@ class Painting( SimpleGeneticAlgorithmBase ):
     ):
         super().__init__( target_image )
 
-        self.target_gradient = ImageGradient( self._target_image )
-        preload_brush_textures( Path( brush_directory ) )
+        self.target_gradient = utils.ImageGradient( self._target_image )
+        primitives.preload_brush_textures( Path( brush_directory ) )
 
         self.brush_size_multiplier = size_multiplier
         self.min_brush_size = min_brush_size
 
-    def get_initial_population( self ) -> Population:
-        blank_image = GA_common.get_blank_image_like( self._target_image )
+    def get_initial_population( self ) -> GA_common.Population:
+        blank_image = primitives.get_blank_image_like( self._target_image )
         abs_diff_image = GA_common.get_absolute_difference_image( blank_image, self._target_image )
         fitness = GA_common.get_fitness_from_absolute_difference_image( abs_diff_image )
         initial_population = [
@@ -83,24 +82,24 @@ class Painting( SimpleGeneticAlgorithmBase ):
         brush_size = max( self.min_brush_size, scaled_brush_size )
         return brush_size
 
-    def apply_mutation_inplace( self, population : Population ):
+    def apply_mutation_inplace( self, population : GA_common.Population ):
         for specimen in population:
-            position = GA_common.sample_weighted_position_from_image( specimen.diff_image )
-            color = GA_common.get_color_from_image( self._target_image, position )
-            texture_index = GA_common.random_brush_texture_index()
+            position = utils.sample_weighted_position_from_image( specimen.diff_image )
+            color = utils.get_color_from_image( self._target_image, position )
+            texture_index = primitives.random_brush_texture_index()
             angle = math.degrees( self.target_gradient.get_direction( position ) )
             brush_size = self._get_brush_size(specimen.fitness)
-            new_brush = Brush(
+            new_brush = primitives.Brush(
                 color = color,
                 position = position,
                 texture_index = texture_index,
                 angle = angle,
                 size = brush_size,
             )
-            draw_brush_on_image( new_brush, specimen.cached_image )
+            primitives.draw_brush_on_image( new_brush, specimen.cached_image )
             specimen.brushes.append( new_brush )
 
-    def get_fitness( self, population : Population ) -> FitnessScores:
+    def get_fitness( self, population : GA_common.Population ) -> GA_common.FitnessScores:
         # we are caching the best fitness score as we use it for brush size calculation if autoscaling is True
         population_fitnesses = super().get_fitness( population )
         # cache the fitness scores per specimen as we will use them to determine new brush sizes

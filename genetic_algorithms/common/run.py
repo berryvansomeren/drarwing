@@ -99,7 +99,7 @@ def run_genetic_algorithm_by_name(
         algorithm_arguments     : Optional[Dict] = None,
         n_iterations_patience   : int   = 100,
         score_interval          : int   = 500,
-        is_pickling_desired     : bool  = False,
+        is_pickling_desired     : bool  = True,
         termination_score       : int   = 3500
 ) -> Any:
 

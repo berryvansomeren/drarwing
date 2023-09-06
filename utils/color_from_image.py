@@ -1,7 +1,6 @@
 import numpy as np
 
-from primitives.color import Color
-from primitives.point import Point
+from primitives import Color, Point
 
 
 def get_color_from_image( image : np.ndarray, position : Point ) -> Color:

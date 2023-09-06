@@ -9,13 +9,11 @@ from genetic_algorithms.common.genetic_algorithm_protocol import Population
 from genetic_algorithms.common.simple_genetic_algorithm_base import SimpleGeneticAlgorithmBase
 from primitives.ellipse import Ellipse, draw_ellipse_on_image
 from primitives.color import get_blank_image_like
-from utils import (
-    ImageGradient,
-    ColorPalette,
-    get_absolute_difference_image,
-    get_color_from_image,
-    sample_weighted_position_from_image,
-)
+from utils.image_gradient import ImageGradient
+from utils.color_palette import ColorPalette
+from utils.absolute_difference_image import get_absolute_difference_image
+from utils.color_from_image import get_color_from_image
+from utils.sample_weighted_position_from_image import sample_weighted_position_from_image
 
 
 class Pointillism( SimpleGeneticAlgorithmBase ):
@@ -41,6 +39,7 @@ class Pointillism( SimpleGeneticAlgorithmBase ):
     def __init__(
             self,
             target_image,
+            out_path_color_palette,
             use_hsv = False,
             short_axis_size = None,
             long_axis_multiplier = 0.005,
@@ -51,7 +50,7 @@ class Pointillism( SimpleGeneticAlgorithmBase ):
             target_image = cv2.cvtColor( target_image, cv2.COLOR_BGR2HSV )
         super().__init__(target_image)
         self._target_gradient = ImageGradient( self._target_image, is_hsv = self.use_hsv )
-        self._color_palette = ColorPalette( self._target_image )
+        self._color_palette = ColorPalette( self._target_image, is_hsv = self.use_hsv, out_path = out_path_color_palette )
 
         if short_axis_size is None:
             # size of dots is based on shortest extend of width and height
@@ -106,4 +105,4 @@ class Pointillism( SimpleGeneticAlgorithmBase ):
 
 
 def get(target_image, **kwargs):
-    return Pointillism(target_image)
+    return Pointillism(target_image, **kwargs)
