@@ -1,6 +1,6 @@
 # D(r)a[r]win(g)
 
-**Also see my blogposts [HERE](https://www.berryvansomeren.com/posts/drarwing), and [HERE](https://www.berryvansomeren.com/posts/drarwing_extra))**
+**Also see my blogposts [HERE](https://www.berryvansomeren.com/posts/drarwing), and [HERE](https://www.berryvansomeren.com/posts/drarwing_extra)**
 
 Drawing using Darwinian principles.  
 We use the principles of reproduction, mutation and survival of the fittest to evolve beautiful images.
